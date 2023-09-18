@@ -10,3 +10,28 @@ export type RequestError = {
   name: string;
   message: string;
 };
+
+export type Cep = {
+  logradouro: string
+  complemento: string
+  bairro: string
+  cidade: string
+  uf: string
+}
+
+export type CepAddress = {
+  cep: string
+  logradouro: string
+  complemento:string
+  bairro:string
+  localidade:string
+  uf:string
+  ibge:string
+  gia:string
+  ddd:string
+  siafi:string
+}
+
+export type CepError = {
+  erro:boolean;
+}
