@@ -1,3 +1,5 @@
+import { Ticket } from "@prisma/client";
+
 export type ApplicationError = {
   name: string;
   message: string;
@@ -11,27 +13,20 @@ export type RequestError = {
   message: string;
 };
 
-export type Cep = {
-  logradouro: string
-  complemento: string
-  bairro: string
-  cidade: string
-  uf: string
-}
+export type ViaCEPAddressError = {
+  error: boolean;
+};
 
-export type CepAddress = {
-  cep: string
-  logradouro: string
-  complemento:string
-  bairro:string
-  localidade:string
-  uf:string
-  ibge:string
-  gia:string
-  ddd:string
-  siafi:string
-}
+export type AddressEnrollment = {
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+};
 
-export type CepError = {
-  erro:boolean;
-}
+export type CEP = {
+  cep: string;
+};
+
+export type createTicket = Omit<Ticket, "id"| "createdAt" | "updatedAt">
