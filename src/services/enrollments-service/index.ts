@@ -1,7 +1,8 @@
 import { Address, Enrollment } from '@prisma/client';
 import { request } from '@/utils/request';
-import { enrollmentNotFoundError, invalidCepError } from '@/errors';
-import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
+import { notFoundError } from '@/errors';
+import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
+import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
 import { AddressEnrollment } from '@/protocols';
 
@@ -9,10 +10,11 @@ async function getAddressFromCEP(cep: string): Promise<AddressEnrollment> {
   const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
   if (!result.data || result.data.erro) {
-    throw invalidCepError();
+    throw notFoundError();
   }
 
   const { bairro, localidade, uf, complemento, logradouro } = result.data;
+
   const address: AddressEnrollment = {
     bairro,
     cidade: localidade,
@@ -27,7 +29,7 @@ async function getAddressFromCEP(cep: string): Promise<AddressEnrollment> {
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
   const enrollmentWithAddress = await enrollmentRepository.findWithAddressByUserId(userId);
 
-  if (!enrollmentWithAddress) throw enrollmentNotFoundError();
+  if (!enrollmentWithAddress) throw notFoundError();
 
   const [firstAddress] = enrollmentWithAddress.Address;
   const address = getFirstAddress(firstAddress);
@@ -50,7 +52,6 @@ type GetAddressResult = Omit<Address, 'createdAt' | 'updatedAt' | 'enrollmentId'
 
 async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollmentWithAddress) {
   const enrollment = exclude(params, 'address');
-  enrollment.birthday = new Date(enrollment.birthday);
   const address = getAddressForUpsert(params.address);
 
   await getAddressFromCEP(address.cep);
@@ -71,8 +72,10 @@ export type CreateOrUpdateEnrollmentWithAddress = CreateEnrollmentParams & {
   address: CreateAddressParams;
 };
 
-export const enrollmentsService = {
+const enrollmentsService = {
   getOneWithAddressByUserId,
   createOrUpdateEnrollmentWithAddress,
   getAddressFromCEP,
 };
+
+export default enrollmentsService;

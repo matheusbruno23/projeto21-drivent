@@ -4,6 +4,8 @@ async function findFirst() {
   return prisma.event.findFirst();
 }
 
-export const eventRepository = {
+const eventRepository = {
   findFirst,
 };
+
+export default eventRepository;

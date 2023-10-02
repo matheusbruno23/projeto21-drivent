@@ -1,10 +1,9 @@
 import faker from '@faker-js/faker';
 import { createUser } from '../factories';
 import { cleanDb } from '../helpers';
-import { prisma } from '@/config';
 import { init } from '@/app';
-import { authenticationService } from '@/services';
-import { invalidCredentialsError } from '@/errors';
+import { prisma } from '@/config';
+import authenticationService, { invalidCredentialsError } from '@/services/authentication-service';
 
 beforeAll(async () => {
   await init();

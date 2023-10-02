@@ -7,7 +7,8 @@ async function get(url: string) {
     return result;
   } catch (error) {
     const { status, statusText } = error.response;
-    throw requestError(status, statusText);
+
+    return requestError(status, statusText);
   }
 }
 

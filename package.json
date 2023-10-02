@@ -1,5 +1,5 @@
 {
-  "name": "drivent-api",
+  "name": "driven.t-back",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -33,6 +33,7 @@
     "express",
     "nodejs"
   ],
+  "author": "Alexandre Nunes",
   "license": "ISC",
   "prisma": {
     "seed": "npm run dev:load-envs -- ts-node prisma/seed.ts"

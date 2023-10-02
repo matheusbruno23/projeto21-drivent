@@ -2,10 +2,9 @@ import faker from '@faker-js/faker';
 import bcrypt from 'bcrypt';
 import { createUser as createUserSeed, createEvent as createEventSeed } from '../factories';
 import { cleanDb } from '../helpers';
-import { init } from '@/app';
+import userService, { duplicatedEmailError } from '@/services/users-service';
 import { prisma } from '@/config';
-import { userService } from '@/services';
-import { duplicatedEmailError } from '@/errors';
+import { init } from '@/app';
 
 beforeAll(async () => {
   await init();

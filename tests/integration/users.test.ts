@@ -4,9 +4,9 @@ import httpStatus from 'http-status';
 import supertest from 'supertest';
 import { createEvent, createUser } from '../factories';
 import { cleanDb } from '../helpers';
-import { duplicatedEmailError } from '@/errors';
-import app, { init } from '@/app';
+import { duplicatedEmailError } from '@/services/users-service';
 import { prisma } from '@/config';
+import app, { init } from '@/app';
 
 beforeAll(async () => {
   await init();
@@ -66,7 +66,7 @@ describe('POST /users', () => {
         const response = await server.post('/users').send(body);
 
         expect(response.status).toBe(httpStatus.CONFLICT);
-        expect(response.body.message).toEqual(duplicatedEmailError().message);
+        expect(response.body).toEqual(duplicatedEmailError());
       });
 
       it('should respond with status 201 and create user when given email is unique', async () => {

@@ -1,22 +1,37 @@
 import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
+
 import { unauthorizedError } from '@/errors';
-import { authenticationRepository } from '@/repositories';
+import { prisma } from '@/config';
 
 export async function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.header('Authorization');
-  if (!authHeader) throw unauthorizedError();
+  if (!authHeader) return generateUnauthorizedResponse(res);
 
   const token = authHeader.split(' ')[1];
-  if (!token) throw unauthorizedError();
+  if (!token) return generateUnauthorizedResponse(res);
 
-  const { userId } = jwt.verify(token, process.env.JWT_SECRET) as JWTPayload;
+  try {
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET) as JWTPayload;
 
-  const session = await authenticationRepository.findSession(token);
-  if (!session) throw unauthorizedError();
+    const session = await prisma.session.findFirst({
+      where: {
+        token,
+      },
+    });
+    if (!session) return generateUnauthorizedResponse(res);
 
-  req.userId = userId;
-  next();
+    req.userId = userId;
+
+    return next();
+  } catch (err) {
+    return generateUnauthorizedResponse(res);
+  }
+}
+
+function generateUnauthorizedResponse(res: Response) {
+  res.status(httpStatus.UNAUTHORIZED).send(unauthorizedError());
 }
 
 export type AuthenticatedRequest = Request & JWTPayload;
